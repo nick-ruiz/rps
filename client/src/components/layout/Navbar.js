@@ -12,8 +12,13 @@ class Navbar extends Component {
           <div className="collapse navbar-collapse" id="mobile-nav">
             <ul className="navbar-nav ml-auto">
               <li className="nav-item">
+                <Link className="nav-link" to="/register">
+                  Register
+                </Link>
+              </li>
+              <li className="nav-item">
                 <Link className="nav-link" to="/login">
-                  Admin Login
+                  Login
                 </Link>
               </li>
             </ul>

@@ -1,21 +1,13 @@
 const Validator = require("validator");
 const isEmpty = require("./is-empty");
 
-module.exports = function validateAddInput(data) {
+module.exports = function validateProfileInput(data) {
   let errors = {};
 
-  data.name = !isEmpty(data.name) ? data.name : "";
   data.streetNumber = !isEmpty(data.streetNumber) ? data.streetNumber : "";
   data.streetName = !isEmpty(data.streetName) ? data.streetName : "";
+  data.city = !isEmpty(data.city) ? data.city : "";
   data.zipCode = !isEmpty(data.zipCode) ? data.zipCode : "";
-
-  if (Validator.isEmpty(data.name)) {
-    errors.name = "Name is required";
-  }
-
-  if (!Validator.isInt(data.streetNumber)) {
-    errors.streetNumber = "Must be a number";
-  }
 
   if (Validator.isEmpty(data.streetNumber)) {
     errors.streetNumber = "Street number is required";
@@ -25,8 +17,12 @@ module.exports = function validateAddInput(data) {
     errors.streetName = "Street name is required";
   }
 
-  if (!Validator.isInt(data.zipCode)) {
-    errors.zipCode = "Must be a number";
+  if (Validator.isEmpty(data.city)) {
+    errors.city = "City is required";
+  }
+
+  if (Validator.isEmpty(data.zipCode)) {
+    errors.zipCode = "Zip code is required";
   }
 
   return {
