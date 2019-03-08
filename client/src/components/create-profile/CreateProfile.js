@@ -3,8 +3,8 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import PropTypes from "prop-types";
 import Script from "react-load-script";
-import { GOOGLE_API_KEY } from "../../config/keys_dev";
 import { createProfile } from "../../actions/profileActions";
+const GOOGLE_API_KEY = require("../../config/keys").GOOGLE_API_KEY;
 
 class CreateProfile extends Component {
   constructor(props) {

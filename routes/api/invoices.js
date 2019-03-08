@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
+const isEmpty = require("../../validation/is-empty");
 
 // Load User model
 const Invoice = require("../../models/Invoice");
@@ -31,10 +32,14 @@ router.post(
         return res.status(400).json(errors);
       }
       const newInvoice = new Invoice({
-        user: req.params.id
+        user: req.params.id,
+        status: "UNPAID"
       });
       if (req.body.date) {
         newInvoice.date = req.body.date;
+      }
+      if (req.body.paid) {
+        newInvoice.paid = req.body.paid;
       }
       if (req.body.service && req.body.cost) {
         const newService = {
@@ -57,10 +62,6 @@ router.post(
   "/add/:id/:inv_id",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
-    if (!req.user.admin) {
-      errors.admin = "User not authorized";
-      return res.status(401).json(errors);
-    }
     const { errors, isValid } = validateInvoiceInput(req.body);
     // Check validation
     if (!isValid) {
@@ -73,15 +74,32 @@ router.post(
         if (!invoice) {
           errors.invoice = "Invoice not found";
           return res.status(400).json(errors);
+        } else if (req.body.status) {
+          invoice.status = req.body.status;
+          invoice.save().then(inv => {
+            return res.json(inv).end();
+          });
+        } else if (!req.user.admin) {
+          errors.admin = "User not authorized";
+          return res.status(401).json(errors);
+        } else {
+          if (req.body.paid) {
+            invoice.paid = req.body.paid;
+            invoice.status = "PAID";
+          }
+          // Get Fields
+          const invoiceFields = {};
+          if (req.body.date) invoiceFields.date = req.body.date;
+          if (req.body.service) invoiceFields.service = req.body.service;
+          if (req.body.cost) {
+            invoice.total += parseFloat(req.body.cost);
+            invoiceFields.cost = req.body.cost;
+          }
+          if (!isEmpty(invoiceFields)) invoice.services.unshift(invoiceFields);
+          invoice.save().then(invoice => {
+            return res.json(invoice);
+          });
         }
-        // Get Fields
-        const invoiceFields = {};
-        if (req.body.paid) invoiceFields.paid = req.body.paid;
-        if (req.body.date) invoiceFields.date = req.body.date;
-        if (req.body.service) invoiceFields.service = req.body.service;
-        if (req.body.cost) invoiceFields.cost = req.body.cost;
-        invoice.services.unshift(invoiceFields);
-        invoice.save().then(invoice => res.json(invoice));
       }
     );
   }
@@ -109,7 +127,7 @@ router.get(
 );
 
 // @route   GET api/invoice/:id
-// @desc    Get invoices
+// @desc    Get invoices by user id
 // @access  Private
 router.get(
   "/:id",
@@ -137,7 +155,8 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     const errors = {};
-    Invoice.find({ id: req.params.id })
+    Invoice.findOne({ _id: req.params.id })
+      .populate("user", ["name"])
       .then(invoice => {
         if (!invoice) {
           errors.noinvoice = "There are no invoices for this user";
@@ -182,7 +201,6 @@ router.post(
           return res.status(400).json(errors);
         }
         // Get Fields
-        if (req.body.paid) invoice.services[index].paid = req.body.paid;
         if (req.body.service)
           invoice.services[index].service = req.body.service;
         if (req.body.cost) invoice.services[index].cost = req.body.cost;
@@ -214,6 +232,7 @@ router.delete(
           errors.service = "Service not found";
           return res.status(400).json(errors);
         }
+        invoice.total -= parseFloat(invoice.services[index].cost);
         // Splice out of array
         invoice.services.splice(index, 1);
         // Save
@@ -228,14 +247,14 @@ router.delete(
   }
 );
 
-// @route   DELETE api/invoices/:id/:inv_id
+// @route   DELETE api/invoice/:id/:inv_id
 // @desc    Delete invoice from customer
 // @access  Private
 router.delete(
   "/:id/:inv_id",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
-    Invoice.findOneAndRemove({
+    Invoice.findOneAndDelete({
       _id: req.params.inv_id,
       user: req.params.id
     }).then(() => {

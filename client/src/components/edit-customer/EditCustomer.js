@@ -5,43 +5,57 @@ import PropTypes from "prop-types";
 import {
   getInvoiceById,
   addInvoiceById,
-  getInvoice
+  getInvoice,
+  deleteInvoice,
+  addService
 } from "../../actions/invoiceActions";
 import { getProfileById } from "../../actions/profileActions";
 //import isEmpty from "../../validation/is-empty";
 import Moment from "react-moment";
 import Spinner from "../common/Spinner";
+import EditService from "./EditService";
 
 class EditCustomer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      service: "",
-      cost: "",
-      paid: "",
       date: "",
       errors: {}
     };
     this.onChange = this.onChange.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
     this.invSubmit = this.invSubmit.bind(this);
   }
 
   componentDidMount() {
     this.props.getInvoice(this.props.match.params.id);
     this.props.getProfileById(this.props.match.params.id);
-    // if (this.props.match.params.id) {
-    //   this.props.getInvoice(this.props.match.params.id);
-    // }
     if (this.props.match.params.inv_id) {
       this.props.getInvoiceById(this.props.match.params.inv_id);
     }
   }
 
+  onClick(id, inv_id) {
+    this.props.deleteInvoice(id, inv_id);
+  }
+
+  markAsPaid(id, inv_id) {
+    this.props.addService(id, inv_id, { paid: true });
+  }
+
+  // componentDidUpdate(p) {
+  //   console.log(this.props);
+  //   // console.log(
+  //   //   `${p.invoice.invoices.length} - ${this.props.invoice.invoices.length}`
+  //   // );
+  //   if (p.invoice.invoices.length < this.props.invoice.invoices.length) {
+  //     p.invoice.invoices = this.props.invoice.invoices;
+  //   }
+  // }
+
   render() {
-    //const { errors } = this.state;
-    const { invoice } = this.props.invoice;
+    const { invoices, invoice } = this.props.invoice;
     const { profile, loading } = this.props.profile;
+    const { id, inv_id } = this.props.match.params;
 
     let dashboardContent;
 
@@ -53,74 +67,16 @@ class EditCustomer extends Component {
       !profile.user
     ) {
       dashboardContent = <Spinner />;
-    } else if (true) {
-      dashboardContent = (
-        <div>
-          <Link to="/dashboard" className="btn btn-light mb-4">
-            Go Back
-          </Link>
-          <h1 className="display-4 text-center mb-4">
-            Edit {profile.user.name}
-          </h1>
-          <form>
-            <div className="input-group">
-              <div className="input-group-prepend">
-                <span className="input-group-text">Service</span>
-              </div>
-              <input
-                type="text"
-                aria-label="service"
-                className="form-control"
-              />
-              <div className="input-group-prepend ml-2">
-                <span className="input-group-text">$</span>
-              </div>
-              <input type="text" aria-label="Cost" className="form-control" />
-              <button
-                className="btn btn-outline-secondary"
-                type="button"
-                id="button-addon2"
-              >
-                Submit
-              </button>
-            </div>
-          </form>
-
-          {invoice.map(inv => (
-            <div className="mt-4 mb-4" key={inv._id}>
-              <h3>
-                Invoice for <Moment format="MM/YYYY">{inv.date}</Moment>
-              </h3>
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Service</th>
-                    <th>Cost</th>
-                    <th>Paid</th>
-                    <th>
-                      <Link
-                        className="btn btn-primary btn-sm mr-1"
-                        to={`/edit-customer/${profile.user._id}/${inv._id}`}
-                      >
-                        Edit
-                      </Link>
-                      <button className="btn btn-danger btn-sm">Delete</button>
-                    </th>
-                    <th />
-                  </tr>
-                  {inv.services.map(serv => (
-                    <tr key={serv._id}>
-                      <td>{serv.service}</td>
-                      <td>{serv.cost}</td>
-                      <td>{serv.paid ? "Yes" : "No"}</td>
-                    </tr>
-                  ))}
-                </thead>
-              </table>
-            </div>
-          ))}
-        </div>
-      );
+    } else if (inv_id) {
+      if (Object.keys(invoice) === 0 || !invoice.user) {
+        dashboardContent = <Spinner />;
+      } else {
+        dashboardContent = (
+          <div>
+            <EditService id={id} inv_id={inv_id} />
+          </div>
+        );
+      }
     } else {
       dashboardContent = (
         <div>
@@ -152,6 +108,61 @@ class EditCustomer extends Component {
               </div>
             </div>
           </form>
+          {invoices.map(inv => (
+            <div className="mt-4 mb-4" key={inv._id}>
+              <h3>
+                Invoice for <Moment format="MM/YYYY">{inv.date}</Moment>
+              </h3>
+              <h5 className="text-right">{`$${inv.total} - ${inv.status}`}</h5>
+              <table className="table text-center">
+                <thead>
+                  <tr>
+                    <th>Service</th>
+                    <th>Cost</th>
+                    <th>
+                      <Link
+                        className="btn btn-primary btn-sm mr-1"
+                        to={`/edit-customer/${profile.user._id}/${inv._id}`}
+                      >
+                        {inv.status !== "UNPAID" ? "View" : "Edit"}
+                      </Link>
+                      {inv.status !== "UNPAID" ? null : (
+                        <button
+                          onClick={this.onClick.bind(
+                            this,
+                            this.props.match.params.id,
+                            inv._id
+                          )}
+                          className="btn btn-danger btn-sm mr-1"
+                        >
+                          Delete
+                        </button>
+                      )}
+                      {!inv.paid ? (
+                        <button
+                          onClick={this.markAsPaid.bind(
+                            this,
+                            this.props.match.params.id,
+                            inv._id
+                          )}
+                          className="btn btn-secondary btn-sm"
+                        >
+                          Mark As Paid
+                        </button>
+                      ) : null}
+                    </th>
+                    <th />
+                  </tr>
+                  {inv.services.map(serv => (
+                    <tr key={serv._id}>
+                      <td>{serv.service}</td>
+                      <td>{serv.cost}</td>
+                    </tr>
+                  ))}
+                </thead>
+              </table>
+            </div>
+          ))}
         </div>
       );
     }
@@ -167,27 +178,6 @@ class EditCustomer extends Component {
     );
   }
 
-  // componentWillReceiveProps(nextProps) {
-  //   if (nextProps.errors) {
-  //     this.setState({ errors: nextProps.errors });
-  //   }
-
-  //   if (nextProps.profile.profile) {
-  //     const profile = nextProps.profile.profile;
-
-  //     // If profile field doesn't exist, make empty string
-  //     profile.service = !isEmpty(profile.service) ? profile.service : "";
-  //     profile.cost = !isEmpty(profile.cost) ? profile.cost : "";
-
-  //     // Set component fields state
-  //     this.setState({
-  //       service: profile.service,
-  //       cost: profile.cost,
-  //       paid: profile.paid
-  //     });
-  //   }
-  // }
-
   invSubmit(e) {
     e.preventDefault();
     const newInv = {
@@ -197,17 +187,6 @@ class EditCustomer extends Component {
     this.props.addInvoiceById(this.props.match.params.id, newInv);
   }
 
-  onSubmit(e) {
-    e.preventDefault();
-    const profileData = {
-      service: this.state.service,
-      cost: this.state.cost,
-      paid: this.state.paid
-    };
-
-    this.props.createProfile(profileData, this.props.history);
-  }
-
   onChange(e) {
     this.setState({ [e.target.name]: e.target.value });
   }
@@ -215,9 +194,11 @@ class EditCustomer extends Component {
 
 EditCustomer.propTypes = {
   getInvoice: PropTypes.func.isRequired,
+  deleteInvoice: PropTypes.func.isRequired,
   getInvoiceById: PropTypes.func.isRequired,
   addInvoiceById: PropTypes.func.isRequired,
   getProfileById: PropTypes.func.isRequired,
+  addService: PropTypes.func.isRequired,
   profile: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired,
   invoice: PropTypes.object.isRequired
@@ -231,5 +212,12 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { getInvoiceById, getProfileById, addInvoiceById, getInvoice }
+  {
+    getInvoiceById,
+    getProfileById,
+    addInvoiceById,
+    getInvoice,
+    deleteInvoice,
+    addService
+  }
 )(withRouter(EditCustomer));

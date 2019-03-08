@@ -48,7 +48,7 @@ router.post("/register", (req, res) => {
             jwt.sign(
               payload,
               keys.secretOrKey,
-              { expiresIn: 10000 },
+              { expiresIn: 3600 },
               (err, token) => {
                 res.json({
                   success: true,

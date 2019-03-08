@@ -8,7 +8,7 @@ import {
 
 const initialState = {
   invoices: [],
-  invoice: [],
+  invoice: {},
   loading: false
 };
 
