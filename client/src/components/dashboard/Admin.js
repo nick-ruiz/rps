@@ -20,7 +20,7 @@ class Admin extends Component {
     ));
     return (
       <div>
-        <h4 className="mb-4">Users</h4>
+        <h4 className="mb-4">Customers</h4>
         <table className="table">
           <thead>
             <tr>

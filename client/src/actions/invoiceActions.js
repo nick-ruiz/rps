@@ -93,26 +93,26 @@ export const getInvoice = id => dispatch => {
     .get(`/api/invoice/${id}`)
     .then(res =>
       dispatch({
-        type: GET_INVOICE,
+        type: GET_INVOICES,
         payload: res.data
       })
     )
     .catch(err =>
       dispatch({
-        type: GET_INVOICE,
-        payload: null
+        type: GET_INVOICES,
+        payload: []
       })
     );
 };
 
 // Delete invoice
-export const deleteInvoice = id => dispatch => {
+export const deleteInvoice = (id, inv_id) => dispatch => {
   axios
-    .delete(`/api/invoice/${id}`)
+    .delete(`/api/invoice/${id}/${inv_id}`)
     .then(res =>
       dispatch({
         type: DELETE_INVOICE,
-        payload: id
+        payload: inv_id
       })
     )
     .catch(err =>
@@ -123,18 +123,49 @@ export const deleteInvoice = id => dispatch => {
     );
 };
 
-// Add like
-// export const addLike = id => dispatch => {
-//   axios
-//     .post(`/api/posts/like/${id}`)
-//     .then(res => dispatch(getPosts()))
-//     .catch(err =>
-//       dispatch({
-//         type: GET_ERRORS,
-//         payload: err.response.data
-//       })
-//     );
-// };
+// Add service to invoice
+export const addService = (id, inv_id, data) => dispatch => {
+  axios
+    .post(`/api/invoice/add/${id}/${inv_id}`, data)
+    .then(res => dispatch({ type: GET_INVOICE, payload: res.data }))
+    .catch(err =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data
+      })
+    );
+};
+
+// Edit invoice
+export const editInvoice = (id, inv_id, data) => dispatch => {
+  axios
+    .post(`/api/invoice/add/${id}/${inv_id}`, data)
+    .then(res => dispatch({ type: GET_INVOICES, payload: res.data }))
+    .catch(err =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data
+      })
+    );
+};
+
+// Delete service from invoice
+export const deleteService = (id, inv_id, serv_id) => dispatch => {
+  axios
+    .delete(`/api/invoice/${id}/${inv_id}/${serv_id}`)
+    .then(res =>
+      dispatch({
+        type: GET_INVOICE,
+        payload: res.data
+      })
+    )
+    .catch(err =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data
+      })
+    );
+};
 
 // // Remove Like
 // export const removeLike = id => dispatch => {

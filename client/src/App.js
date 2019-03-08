@@ -9,6 +9,7 @@ import { Provider } from "react-redux";
 import store from "./store";
 
 import PrivateRoute from "./components/common/PrivateRoute";
+import AdminRoute from "./components/common/AdminRoute";
 
 import Navbar from "./components/layout/Navbar";
 import Landing from "./components/layout/Landing";
@@ -19,6 +20,8 @@ import Dashboard from "./components/dashboard/Dashboard";
 import CreateProfile from "./components/create-profile/CreateProfile";
 import Admin from "./components/dashboard/Admin";
 import EditCustomer from "./components/edit-customer/EditCustomer";
+import NotFound from "./components/not-found/NotFound";
+import Payment from "./components/payment/Payment";
 
 import "./App.css";
 
@@ -38,8 +41,8 @@ if (localStorage.jwtToken) {
     store.dispatch(logoutUser());
     // Clear current profile
     store.dispatch(clearCurrentProfile());
-    // Redirect to login
-    window.location.href = "/login";
+    // Redirect
+    window.location.href = "/";
   }
 }
 
@@ -65,15 +68,30 @@ class App extends Component {
                 />
               </Switch>
               <Switch>
-                <PrivateRoute exact path="/admin" component={Admin} />
+                <AdminRoute exact path="/admin" component={Admin} />
               </Switch>
               <Switch>
-                <PrivateRoute
+                <AdminRoute
                   exact
                   path="/edit-customer/:id"
                   component={EditCustomer}
                 />
               </Switch>
+              <Switch>
+                <AdminRoute
+                  exact
+                  path="/edit-customer/:id/:inv_id"
+                  component={EditCustomer}
+                />
+              </Switch>
+              <Switch>
+                <PrivateRoute
+                  exact
+                  path="/payment/:id/:inv_id"
+                  component={Payment}
+                />
+              </Switch>
+              <Route path="/not-found" component={NotFound} />
             </div>
             <Footer />
           </div>
