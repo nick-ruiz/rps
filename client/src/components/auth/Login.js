@@ -12,7 +12,6 @@ class Login extends Component {
       password: "",
       errors: {}
     };
-
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
   }
@@ -48,7 +47,6 @@ class Login extends Component {
 
   render() {
     const { errors } = this.state;
-
     return (
       <div className="login" id="stick">
         <div className="container">
