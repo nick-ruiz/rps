@@ -79,7 +79,7 @@ class EditCustomer extends Component {
       }
     } else {
       dashboardContent = (
-        <div>
+        <div className="invoice">
           <Link to="/dashboard" className="btn btn-light mb-4">
             Go Back
           </Link>
@@ -171,7 +171,9 @@ class EditCustomer extends Component {
       <div className="create-profile">
         <div className="container">
           <div className="row">
-            <div className="col-md-8 m-auto">{dashboardContent}</div>
+            <div className="col-md-8 m-auto">
+              <div className="footer-spacing">{dashboardContent}</div>
+            </div>
           </div>
         </div>
       </div>

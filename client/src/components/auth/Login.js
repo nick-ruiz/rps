@@ -48,7 +48,7 @@ class Login extends Component {
   render() {
     const { errors } = this.state;
     return (
-      <div className="login" id="stick">
+      <div className="login footer-spacing">
         <div className="container">
           <div className="row">
             <div className="col-md-8 m-auto">

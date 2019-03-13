@@ -7,7 +7,7 @@ import PropTypes from "prop-types";
 class Invoice extends Component {
   render() {
     return this.props.invoice.map(inv => (
-      <div key={inv._id}>
+      <div className="invoice" key={inv._id}>
         <h4>
           Invoice for <Moment format="MM/YYYY">{inv.date}</Moment>
         </h4>

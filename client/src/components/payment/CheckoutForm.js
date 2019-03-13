@@ -57,11 +57,14 @@ class CheckoutForm extends Component {
     if (Object.keys(invoice) === 0 || isEmpty(invoice)) return <Spinner />;
 
     return (
-      <div className="checkout">
+      <div className="checkout footer-spacing">
         <div className="col-md-12">
           <p className="display-4 text-center mt-4 pb-4">
             Would you like to complete the purchase?
           </p>
+          <Link to="/dashboard" className="btn btn-secondary btn-sm">
+            Go Back
+          </Link>
           <div className="col-md-4 mx-auto">
             <div className="card card-body bg-light mb-3">
               {this.state.complete ? (
