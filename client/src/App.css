@@ -6,15 +6,12 @@ body {
 }
 
 /* .landing {
-  position: relative;
-  height: 100vh;
-  margin-top: -24px;
-  margin-bottom: -100px;
+  border: 1px solid red;
 } */
 
-.landing-inner {
+/* .landing-inner {
   padding-top: 80px;
-}
+} */
 
 .card-form {
   opacity: 0.9;
@@ -26,7 +23,6 @@ body {
 
 .footer-spacing {
   padding-bottom: 80px;
-  /* border: 1px solid red; */
 }
 
 .footer {
@@ -34,5 +30,4 @@ body {
   bottom: 0;
   width: 100%;
   height: 75px;
-  /* border: 1px solid blue; */
 }

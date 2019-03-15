@@ -10,7 +10,6 @@ import {
   addService
 } from "../../actions/invoiceActions";
 import { getProfileById } from "../../actions/profileActions";
-//import isEmpty from "../../validation/is-empty";
 import Moment from "react-moment";
 import Spinner from "../common/Spinner";
 import EditService from "./EditService";
@@ -20,7 +19,7 @@ class EditCustomer extends Component {
     super(props);
     this.state = {
       date: "",
-      errors: {}
+      invoice: {}
     };
     this.onChange = this.onChange.bind(this);
     this.invSubmit = this.invSubmit.bind(this);
@@ -28,6 +27,7 @@ class EditCustomer extends Component {
 
   componentDidMount() {
     this.props.getInvoice(this.props.match.params.id);
+    this.setState({ invoice: this.props.invoice });
     this.props.getProfileById(this.props.match.params.id);
     if (this.props.match.params.inv_id) {
       this.props.getInvoiceById(this.props.match.params.inv_id);
@@ -38,19 +38,10 @@ class EditCustomer extends Component {
     this.props.deleteInvoice(id, inv_id);
   }
 
-  markAsPaid(id, inv_id) {
-    this.props.addService(id, inv_id, { paid: true });
+  async markAsPaid(id, inv_id) {
+    await this.props.addService(id, inv_id, { paid: true });
+    this.props.getInvoice(this.props.match.params.id);
   }
-
-  // componentDidUpdate(p) {
-  //   console.log(this.props);
-  //   // console.log(
-  //   //   `${p.invoice.invoices.length} - ${this.props.invoice.invoices.length}`
-  //   // );
-  //   if (p.invoice.invoices.length < this.props.invoice.invoices.length) {
-  //     p.invoice.invoices = this.props.invoice.invoices;
-  //   }
-  // }
 
   render() {
     const { invoices, invoice } = this.props.invoice;
@@ -73,7 +64,7 @@ class EditCustomer extends Component {
       } else {
         dashboardContent = (
           <div>
-            <EditService id={id} inv_id={inv_id} />
+            <EditService id={id} inv_id={inv_id} name={profile.user.name} />
           </div>
         );
       }
@@ -108,61 +99,69 @@ class EditCustomer extends Component {
               </div>
             </div>
           </form>
-          {invoices.map(inv => (
-            <div className="mt-4 mb-4" key={inv._id}>
-              <h3>
-                Invoice for <Moment format="MM/YYYY">{inv.date}</Moment>
-              </h3>
-              <h5 className="text-right">{`$${inv.total} - ${inv.status}`}</h5>
-              <table className="table text-center">
-                <thead>
-                  <tr>
-                    <th>Service</th>
-                    <th>Cost</th>
-                    <th>
-                      <Link
-                        className="btn btn-primary btn-sm mr-1"
-                        to={`/edit-customer/${profile.user._id}/${inv._id}`}
-                      >
-                        {inv.status !== "UNPAID" ? "View" : "Edit"}
-                      </Link>
-                      {inv.status !== "UNPAID" ? null : (
-                        <button
-                          onClick={this.onClick.bind(
-                            this,
-                            this.props.match.params.id,
-                            inv._id
-                          )}
-                          className="btn btn-danger btn-sm mr-1"
+          {invoices.length === 0 ? (
+            <h1 className="text-center display-4 mt-3">
+              There are no invoices
+            </h1>
+          ) : (
+            invoices.map(inv => (
+              <div className="mt-4 mb-4" key={inv._id}>
+                <h3>
+                  Invoice for <Moment format="MM/YYYY">{inv.date}</Moment>
+                </h3>
+                <h5 className="text-right">{`$${inv.total} - ${
+                  inv.status
+                }`}</h5>
+                <table className="table text-center">
+                  <thead>
+                    <tr>
+                      <th>Service</th>
+                      <th>Cost</th>
+                      <th>
+                        <Link
+                          className="btn btn-primary btn-sm mr-1"
+                          to={`/edit-customer/${profile.user._id}/${inv._id}`}
                         >
-                          Delete
-                        </button>
-                      )}
-                      {!inv.paid ? (
-                        <button
-                          onClick={this.markAsPaid.bind(
-                            this,
-                            this.props.match.params.id,
-                            inv._id
-                          )}
-                          className="btn btn-secondary btn-sm"
-                        >
-                          Mark As Paid
-                        </button>
-                      ) : null}
-                    </th>
-                    <th />
-                  </tr>
-                  {inv.services.map(serv => (
-                    <tr key={serv._id}>
-                      <td>{serv.service}</td>
-                      <td>{serv.cost}</td>
+                          {inv.status !== "UNPAID" ? "View" : "Edit"}
+                        </Link>
+                        {inv.status !== "UNPAID" ? null : (
+                          <button
+                            onClick={this.onClick.bind(
+                              this,
+                              this.props.match.params.id,
+                              inv._id
+                            )}
+                            className="btn btn-danger btn-sm mr-1"
+                          >
+                            Delete
+                          </button>
+                        )}
+                        {!inv.paid ? (
+                          <button
+                            onClick={this.markAsPaid.bind(
+                              this,
+                              this.props.match.params.id,
+                              inv._id
+                            )}
+                            className="btn btn-secondary btn-sm"
+                          >
+                            Mark As Paid
+                          </button>
+                        ) : null}
+                      </th>
+                      <th />
                     </tr>
-                  ))}
-                </thead>
-              </table>
-            </div>
-          ))}
+                    {inv.services.map(serv => (
+                      <tr key={serv._id}>
+                        <td>{serv.service}</td>
+                        <td>{serv.cost}</td>
+                      </tr>
+                    ))}
+                  </thead>
+                </table>
+              </div>
+            ))
+          )}
         </div>
       );
     }

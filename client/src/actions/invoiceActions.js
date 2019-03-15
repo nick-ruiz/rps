@@ -138,6 +138,7 @@ export const addService = (id, inv_id, data) => dispatch => {
 
 // Edit invoice
 export const editInvoice = (id, inv_id, data) => dispatch => {
+  dispatch(setInvoiceLoading());
   axios
     .post(`/api/invoice/add/${id}/${inv_id}`, data)
     .then(res => dispatch({ type: GET_INVOICES, payload: res.data }))

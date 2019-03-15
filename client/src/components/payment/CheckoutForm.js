@@ -21,10 +21,14 @@ class CheckoutForm extends Component {
     const { invoice } = this.props.invoice;
     this.setState({
       amount: invoice.total,
-      desc: `${invoice.user.name} - ${moment(invoice.date).format("MM/YY")}`,
+      desc: `${invoice.user.name} - ${moment(invoice.date).format(
+        "MM/YY"
+      )} - PAID: ${moment(Date.now()).format("MM/DD/YY")}`,
       loading: true
     });
-    let { token } = await this.props.stripe.createToken({ name: "Name" });
+    let { token } = await this.props.stripe.createToken({
+      name: invoice.user.name
+    });
     axios
       .post("/api/payment/charge", {
         amount: this.state.amount * 100,
@@ -32,7 +36,6 @@ class CheckoutForm extends Component {
         source: token.id
       })
       .then(res => {
-        //return res.data;
         if (res.data.status === "succeeded") {
           this.props.addService(
             this.props.match.params.id,

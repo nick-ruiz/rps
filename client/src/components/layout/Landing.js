@@ -23,7 +23,7 @@ class Landing extends Component {
                 <p className="lead text-dark">
                   Login or Register to check your billing information.
                 </p>
-                <div className="mt-5">
+                <div className="mt-4">
                   <Link
                     to="/login"
                     className="btn btn-light btn-outline-dark mr-2"
