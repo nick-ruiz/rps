@@ -10,7 +10,7 @@ router.post("/charge", async (req, res) => {
       amount: req.body.amount,
       currency: "usd",
       description: req.body.desc,
-      source: "tok_mastercard"
+      source: req.body.source
     });
     return res.json({ status });
   } catch (err) {

@@ -51,7 +51,7 @@ class EditService extends Component {
           Invoice for <Moment format="MM/YYYY">{invoice.date}</Moment>
         </h3>
         <h1 className="display-4 text-center mb-4">
-          Add service for {invoice.user.name}
+          Add service for {this.props.name}
         </h1>
         {editable ? (
           <form onSubmit={this.servSubmit}>
@@ -77,7 +77,7 @@ class EditService extends Component {
                 className="form-control"
               />
               <button
-                className="btn btn-outline-secondary"
+                className="btn btn-outline-secondary ml-2"
                 type="submit"
                 id="button-addon2"
               >
