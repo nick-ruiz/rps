@@ -10,7 +10,10 @@ router.post("/charge", async (req, res) => {
       amount: req.body.amount,
       currency: "usd",
       description: req.body.desc,
-      source: "tok_mastercard"
+      source:
+        process.env.NODE_ENV === "production"
+          ? req.body.source
+          : "tok_mastercard"
     });
     return res.json({ status });
   } catch (err) {
