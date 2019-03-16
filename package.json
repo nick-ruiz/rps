@@ -8,7 +8,8 @@
     "start": "node server.js",
     "server": "nodemon server.js",
     "client": "npm start --prefix client",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "build": "REACT_APP_STRIPE_API_KEY=$REACT_APP_STRIPE_API_KEY REACT_APP_GOOGLE_API_KEY=$REACT_APP_GOOGLE_API_KEY npm run build --prefix client"
   },
   "author": "Nicholas Ruiz",
   "license": "MIT",
